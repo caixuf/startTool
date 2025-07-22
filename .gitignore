@@ -1,0 +1,119 @@
+# 编译输出目录
+build/
+bin/
+lib/
+obj/
+
+# CMake生成的文件
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# 编译生成的文件
+*.o
+*.obj
+*.so
+*.dll
+*.dylib
+*.a
+*.lib
+*.exe
+
+# 调试符号文件
+*.dSYM/
+*.pdb
+
+# 日志文件
+logs/
+*.log
+
+# 配置文件（除了示例配置）
+config/*.json
+!config/demo.json
+!config/example.json
+
+# 临时文件
+*.tmp
+*.temp
+*~
+.*.swp
+.*.swo
+
+# IDE和编辑器文件
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# 系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 依赖管理
+node_modules/
+.npm/
+vendor/
+
+# 测试覆盖率报告
+coverage/
+*.gcov
+*.gcda
+*.gcno
+lcov.info
+
+# Valgrind输出
+*.valgrind
+vgcore.*
+
+# 核心转储文件
+core
+core.*
+
+# 性能分析文件
+*.prof
+gmon.out
+perf.data*
+
+# 文档生成
+docs/html/
+docs/latex/
+docs/man/
+Doxyfile.bak
+
+# 包文件
+*.tar.gz
+*.zip
+*.7z
+*.rar
+
+# 自动生成的版本文件
+version.h
+build_info.h
+
+# 本地环境变量文件
+.env
+.env.local
+.env.*.local
+
+# 用户特定配置
+local.json
+user_config.json
+
+# 备份文件
+*.bak
+*.backup
+*.orig
+
+# 锁文件
+*.lock
