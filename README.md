@@ -197,6 +197,12 @@ startTool/
 
 ## 🚀 快速开始
 
+### 📚 学习文档（适合不同水平）
+
+- **🔰 新手入门** - [快速入门指南](docs/QUICK_START.md) - 30分钟理解核心概念
+- **📖 详细学习** - [完整学习指南](docs/LEARNING_GUIDE.md) - 适合1年经验开发者的4周学习计划  
+- **🎯 实战练习** - [实战项目集](docs/PRACTICE_PROJECTS.md) - 4个渐进式练习项目
+
 ### 环境要求
 
 - **操作系统**：Linux (Ubuntu 18.04+, CentOS 7+)
