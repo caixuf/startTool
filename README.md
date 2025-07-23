@@ -861,9 +861,9 @@ cmake -DCMAKE_BUILD_TYPE=Release \
 
 ### 问题反馈
 
-- **Bug报告**: [GitHub Issues](https://github.com/username/startTool/issues)
-- **功能请求**: [GitHub Discussions](https://github.com/username/startTool/discussions)
-- **技术交流**: 微信群 (扫码加入)
+- **Bug报告**: [GitHub Issues](https://github.com/caixuf/startTool/issues)
+- **功能请求**: [GitHub Discussions](https://github.com/caixuf/startTool/discussions)
+- **技术交流**: 邮件联系
 
 ### 贡献指南
 
@@ -919,9 +919,9 @@ cmake -DCMAKE_BUILD_TYPE=Release \
 
 **联系方式:**
 
-- 📧 Email: <contact@example.com>
-- 💬 微信: contact_wechat  
-- 🔗 GitHub: [https://github.com/username/startTool](https://github.com/username/startTool)
+- 📧 Email: <2024740941@qq.com>
+- 💬 微信: xxxxx  
+- 🔗 GitHub: [https://github.com/caixuf/startTool](https://github.com/caixuf/startTool)
 
    - 监控系统：监控进程状态和资源使用
 
