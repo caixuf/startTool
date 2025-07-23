@@ -85,7 +85,7 @@ docs/
 
 - **GitHub Issues**: 报告bug或请求功能
 - **GitHub Discussions**: 技术讨论和问答
-- **邮件联系**: <contact@example.com>
+- **邮件联系**: <2024740941@qq.com>
 
 ---
 
