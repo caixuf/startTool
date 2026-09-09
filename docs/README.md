@@ -26,7 +26,7 @@
 | 当前算法与职责边界 | [算法栈](ALGORITHM_STACK.md) | [算法验证](ALGORITHM_VERIFY_PATTERN.md)、[算法集成](ALGORITHM_INTEGRATION.md) |
 | 规划速度剖面（ST 图 + DP） | [速度规划说明](PLANNING_SPEED_UPGRADE_DESIGN.md) | [算法栈](ALGORITHM_STACK.md) |
 | 控制与真车标定 | [标定指南](CALIBRATION_GUIDE.md) | [算法验证](ALGORITHM_VERIFY_PATTERN.md) |
-| FlowSim、场景与场景回归 | [仿真指南](SIMULATION_GUIDE.md) | [场景设计教程](book/16_flowsim_scenario_design.md) |
+| FlowSim、场景与场景回归 | [仿真指南](SIMULATION_GUIDE.md) | [场景设计教程](book/18_flowsim_scenario_design.md) |
 | FlowSim 几何 / 运动 invariant | [Sim Digest](SIM_DIGEST.md) | [仿真指南](SIMULATION_GUIDE.md) |
 | Bag 通用录制与回放 | [Bag 教程](book/05_bag_recording.md) | [API 速查](API_QUICK_REFERENCE.md) |
 | flowrec 配置化留存节点 | [flowrec](FLOWREC.md) | [监控架构](MONITORING_ARCHITECTURE.md) |
@@ -34,7 +34,7 @@
 | FlowBoard 场景帧与 `road_network` schema | [FlowBoard Scene 契约](FLOWBOARD_SCENE_CONTRACT.md) | [可视化架构](VISUALIZATION_ARCHITECTURE.md) |
 | FlowBoard 运行时架构 | [可视化架构](VISUALIZATION_ARCHITECTURE.md) | [vis View 接入规范](VIS_MODULE_GUIDE.md) |
 | PEM 与车端数据采集 | [数据闭环](DATA_CLOSED_LOOP.md) | [硬件部署](HARDWARE_DEPLOYMENT.md) |
-| 训练、影子推理与 OTA | [学习闭环](LEARNING_LOOP.md) | [学习教程](book/13_e2e_learning_loop.md) |
+| 训练、影子推理与 OTA | [学习闭环](LEARNING_LOOP.md) | [学习教程](book/19_e2e_learning_loop.md) |
 | 真车 profile、打包与升级 | [硬件部署](HARDWARE_DEPLOYMENT.md) | [RC 小车清单](RC_CAR_HARDWARE_CHECKLIST.md) |
 | 3D 仪表盘故障 | [3D 仪表盘排查](TROUBLESHOOTING_3D_DASHBOARD.md) | [监控架构](MONITORING_ARCHITECTURE.md) |
 
@@ -61,7 +61,7 @@
 |------|------|
 | [FLOWBOARD_CONTRACT.md](FLOWBOARD_CONTRACT.md) | FlowBoard 数据契约 |
 | [FLOWBOARD_SCENE_CONTRACT.md](FLOWBOARD_SCENE_CONTRACT.md) | FlowBoard 3D Scene 数据契约 |
-| [SCHEMA_road_network.md](SCHEMA_road_network.md) | road_network JSON Schema |
+| [MAP_ENGINE_ROUTING.md](MAP_ENGINE_ROUTING.md) | road_network 顶层 Schema 与路由契约 |
 | [SIM_DIGEST.md](SIM_DIGEST.md) | 仿真 digest / invariant 与调试可视化 |
 
 ## 硬件部署
@@ -75,7 +75,7 @@
 
 | 文档 | 说明 |
 |------|------|
-| [DRIVING_SCHOOL_PLAN.md](DRIVING_SCHOOL_PLAN.md) | 驾校计划（科目一至科目四场景） |
+| [scenarios/ 驾校考试场景](../scenarios/) | 驾校考试场景 JSON（路考/安全/交规/侧方停车等科目） |
 
 ## 故障排查
 
