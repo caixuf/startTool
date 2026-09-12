@@ -220,7 +220,8 @@ fi
 PIPELINE_TMP=""
 cleanup_pipeline_tmp() {
   [ -n "$PIPELINE_TMP" ] && rm -f "$PIPELINE_TMP"
-  [ -n "$ROUTE_SCENARIO_TMP" ] && rm -f "$ROUTE_SCENARIO_TMP"
+  [ -n "${ROUTE_SCENARIO_TMP:-}" ] && rm -f "$ROUTE_SCENARIO_TMP"
+  return 0
 }
 if [ -z "$SCENARIO" ]; then
   SCENARIO="$DEFAULT_SCENARIO"
@@ -354,22 +355,30 @@ elif [ -n "$BUILD_LOCK" ] && command -v flock >/dev/null 2>&1; then
   exec 9>"$BUILD_LOCK"
   flock 9
 fi
-if [ "$SKIP_BUILD" != "1" ] && [ ! -f "$LAUNCHER_BIN" ]; then
-  echo "  First build, this may take a moment..."
-  # 仅 Linux 强制 gcc（项目在 Ubuntu/CI 上以 gcc 为准）；macOS 无 gcc，用系统
-  # 默认 Apple clang（C++20 协程 -std=c++20 原生支持，无需 -fcoroutines）。
-  CC_ARG=""
-  [ "$(uname -s)" = "Linux" ] && CC_ARG="-DCMAKE_C_COMPILER=gcc"
-  cmake -S "$ROOT" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release $CC_ARG > /dev/null 2>&1
-fi
 if [ "$SKIP_BUILD" != "1" ]; then
+  if [ ! -f "$BUILD_DIR/CMakeCache.txt" ]; then
+    echo "  First build, this may take a moment..."
+    # 仅 Linux 强制 gcc（项目在 Ubuntu/CI 上以 gcc 为准）；macOS 无 gcc，用系统
+    # 默认 Apple clang（C++20 协程 -std=c++20 原生支持，无需 -fcoroutines）。
+    CC_ARG=""
+    [ "$(uname -s)" = "Linux" ] && CC_ARG="-DCMAKE_C_COMPILER=gcc"
+    cmake -S "$ROOT" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release $CC_ARG > /dev/null 2>&1
+  fi
+
+  # 确定构建目标：flow_launcher、flow_node_host、flowmond 为核心目标；
+  # frenet_bridge 与 frenet_planner 在可用时一同构建，若目标尚未生成则跳过避免阻断构建
+  BUILD_TARGETS=(flow_launcher flow_node_host flowmond)
+  if cmake --build "$BUILD_DIR" --target help 2>/dev/null | grep -q ' frenet_bridge'; then
+    BUILD_TARGETS+=(frenet_bridge frenet_planner)
+  fi
+
 set -o pipefail  # scoped to this build block only — restored via `set +o pipefail`
                  # below once both `cmake --build ... | tail -1` calls are done, so
                  # a build failure surfaces (pipeline exit = cmake's, not tail's)
                  # without changing pipe-failure semantics for the rest of the script.
-if ! cmake --build "$BUILD_DIR" --target flow_launcher flow_node_host flowmond frenet_bridge frenet_planner -j"$NPROC" 2>&1 | tail -1; then
-  echo "  ✗ Build failed for flow_launcher/flow_node_host/flowmond — re-run without the trailing"
-  echo "    'tail -1' filter (cmake --build \"$BUILD_DIR\" --target flow_launcher flow_node_host flowmond) to see the full error."
+if ! cmake --build "$BUILD_DIR" --target "${BUILD_TARGETS[@]}" -j"$NPROC" 2>&1 | tail -1; then
+  echo "  ✗ Build failed for ${BUILD_TARGETS[*]} — re-run without the trailing"
+  echo "    'tail -1' filter (cmake --build \"$BUILD_DIR\" --target ${BUILD_TARGETS[*]}) to see the full error."
   exit 1
 fi
 # Also build node plugins. They live in a separate CMake project, so the main

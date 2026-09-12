@@ -463,12 +463,10 @@ endif()
 find_library(FRENET_BRIDGE
     NAMES frenet_bridge
     HINTS ${FLOWENGINE_BUILD}/lib ${FLOWENGINE_BUILD}/lib/Release ${FLOWENGINE_BUILD}/lib/Debug
-          ${FLOW_ROOT}/build-algo/lib
 )
 find_library(FRENET_PLANNER
     NAMES frenet_planner
     HINTS ${FLOWENGINE_BUILD}/lib ${FLOWENGINE_BUILD}/lib/Release ${FLOWENGINE_BUILD}/lib/Debug
-          ${FLOW_ROOT}/build-algo/lib
 )
 add_library(planning_node SHARED planning_node.cpp st_graph.c)
 target_compile_definitions(planning_node PRIVATE FLOWCORO_INTEGRATION)

@@ -640,6 +640,12 @@ target_include_directories(frenet_bridge PUBLIC
 target_link_libraries(frenet_bridge PUBLIC frenet_planner Eigen3::Eigen m)
 target_compile_options(frenet_bridge PRIVATE
     $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-unused-variable -Wno-sign-compare>)
+else()
+    # When Eigen is absent, provide dummy targets so that commands building
+    # frenet_bridge / frenet_planner do not fail with "No rule to make target".
+    # planning_node will detect the absence of the static libraries and fall back.
+    add_custom_target(frenet_planner)
+    add_custom_target(frenet_bridge)
 endif() # FLOWENGINE_HAVE_EIGEN
 
 # =============================================================================
