@@ -68,6 +68,28 @@ jobs:
           fi
           echo "✓ modules/ uses clock_now_us() exclusively"
 
+  # ── topic contract gate ────────────────────────────────────
+  # pipeline.json subscribe/publish must match NodePlugin s_inputs/s_outputs
+  # (default profile: exact set equality; experimental/hw: JSON ⊆ code).
+  # Prevents config/docs drift like safety_control omitting control/raw_cmd.
+  topic-contract-gate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enforce NodePlugin topic contract vs config/pipeline*.json
+        run: python3 ci/gates/topic_contract_check.py
+
+  # ── zombie dashboard path ban ──────────────────────────────
+  # The legacy Python HTTP dashboard was replaced by flowmond. Reintroducing
+  # that retired entrypoint (or leaving orphaned .pyc) breaks the single
+  # dashboard backend rule.
+  zombie-ban-gate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject retired Python dashboard entrypoint / orphan pyc
+        run: python3 ci/gates/zombie_ban_check.py
+
   # ── map connectivity gate ──────────────────────────────────
   # 每个被 scenarios/*.json 引用的地图，main 链车道连通性回归检查
   # （tools/check_map_connectivity.py → astar_route.py --check）。
@@ -224,7 +246,7 @@ jobs:
         run: python3 tools/pipeline_check.py --json /tmp/flow_topology.json
 
   # ── Visualization layer (flowmond) + algorithm regression ──
-  # Builds flowmond (the C dashboard daemon that replaced flowboard_server.py)
+  # Builds flowmond (the C dashboard daemon; sole HTTP backend for FlowBoard)
   # and runs the pytest suite under ci/evaluators/ (control-node curve-fallback
   # regression etc.). The flowmond HTTP API is smoke-tested directly.
   viz:

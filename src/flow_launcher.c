@@ -156,6 +156,19 @@ static int parse_pipeline(const char* path, int* stagger_ms_out) {
 
     LOG_INFO("launcher", "config loaded: %d nodes (from %d processes)",
              g_node_count, cfg->process_count);
+    LOG_INFO("launcher", "pipeline profile: %s",
+             cfg->profile[0] ? cfg->profile : "default");
+    if (cfg->profile[0] && strcmp(cfg->profile, "default") != 0) {
+        LOG_WARN("launcher",
+                 "profile='%s' is NOT the default demo path "
+                 "(experimental/hw may omit classic control or use dry-run adapters)",
+                 cfg->profile);
+        if (strcmp(cfg->profile, "experimental") == 0) {
+            LOG_WARN("launcher",
+                     "experimental profile: treat cortex/direct_ctrl as shadow-adjacent; "
+                     "do not assume production safety gating");
+        }
+    }
     config_free(cfg);
     return g_node_count;
 }

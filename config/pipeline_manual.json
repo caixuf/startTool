@@ -183,5 +183,7 @@
       ],
       "params": "{\"state_file\":\"/tmp/flow_topology.json\",\"export_scene\":true}"
     }
-  ]
+  ],
+  "profile": "experimental",
+  "_comment": "profile=experimental: manual drive profile"
 }

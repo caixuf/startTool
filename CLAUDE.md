@@ -12,6 +12,22 @@
 >
 > **重构类改动** commit body 必含 `Removed:` 段（详见 `~/.claude/skills/workflow/SKILL.md` 第七节），纯新增/fix/docs 可省略。
 
+## 低维护治理（2026-09）
+
+一次对齐后靠 CI 守门，避免拓扑声明再次漂移：
+
+| 闸门 | 命令 | 挡住什么 |
+|------|------|----------|
+| topic-contract | `python3 ci/gates/topic_contract_check.py` | `pipeline.json` ↔ `s_inputs`/`s_outputs` 漂移 |
+| zombie-ban | `python3 ci/gates/zombie_ban_check.py` | 退役 Python 仪表盘入口回潮 |
+| scenario/clock/map | 已有 | 空场景引用 / 禁 raw clock / 断链地图 |
+
+**纪律：**
+- 仪表盘唯一后端：`flowmond`（勿再引入第二套 HTTP server）
+- `profile=default` 才是 demo/CI 主路径；`experimental`（cortex）/`hw`（car）启动会打警告
+- 不拆 god-node 当日常活；行为靠 `demo_evaluator` 不变量锁
+- `docs/PIPELINE_ARCHITECTURE.md` 已废弃，勿再手写第二份拓扑
+
 ## 架构
 
 ```

@@ -45,12 +45,7 @@
           }
         },
         {
-          "topic": "scene/frame",
-          "qos": {
-            "depth": 1,
-            "policy": "drop_oldest",
-            "reliability": "best_effort"
-          }
+          "topic": "road/ref_path"
         },
         {
           "topic": "sim/tick",
@@ -67,6 +62,17 @@
             "policy": "drop_oldest",
             "reliability": "best_effort"
           }
+        },
+        {
+          "topic": "scene/frame",
+          "qos": {
+            "depth": 1,
+            "policy": "drop_oldest",
+            "reliability": "best_effort"
+          }
+        },
+        {
+          "topic": "environment/state"
         }
       ],
       "params": "{\"init_speed\": 5.0, \"target_speed\": 20.0, \"random_seed\": 42, \"scenario_file\": \"scenarios/straight_road.json\", \"physics_model\": \"kinematic\"}"
@@ -76,7 +82,8 @@
       "library_path": "build/lib/libsensor_model.so",
       "auto_start": true,
       "subscribe": [
-        "vehicle/state"
+        "vehicle/state",
+        "environment/state"
       ],
       "publish": [
         {
@@ -117,7 +124,8 @@
       "auto_start": true,
       "subscribe": [
         "vehicle/state",
-        "sensor/lidar"
+        "sensor/lidar",
+        "road/geometry"
       ],
       "publish": [
         {
@@ -148,8 +156,8 @@
       "library_path": "build/lib/libfusion_node.so",
       "auto_start": true,
       "subscribe": [
-        "sensor/gps",
         "sensor/lidar",
+        "sensor/gps",
         "sensor/pose"
       ],
       "publish": [
@@ -203,7 +211,8 @@
       "library_path": "build/lib/libnavigation_node.so",
       "auto_start": true,
       "subscribe": [
-        "fusion/localization"
+        "fusion/localization",
+        "road/ref_path"
       ],
       "publish": [
         {
@@ -226,7 +235,9 @@
         "fusion/localization",
         "perception/obstacles",
         "road/geometry",
+        "road/ref_path",
         "road/traffic_lights",
+        "environment/state",
         "scene/frame",
         "planning/behavior",
         "navigation/path"
@@ -249,7 +260,6 @@
       "subscribe": [
         "fusion/localization",
         "planning/trajectory",
-        "road/ref_path",
         "planning/behavior"
       ],
       "publish": [
@@ -271,6 +281,7 @@
       "library_path": "build/lib/libsafety_control_node.so",
       "auto_start": true,
       "subscribe": [
+        "control/raw_cmd",
         "fusion/localization",
         "perception/obstacles"
       ],
@@ -284,6 +295,9 @@
             "reliability": "best_effort",
             "deadline_ms": 50
           }
+        },
+        {
+          "topic": "safety/evidence"
         }
       ],
       "params": "{\"max_throttle\":1.0,\"max_steer\":0.22,\"low_speed_steer\":0.18,\"time_headway\":1.3}"
@@ -293,10 +307,13 @@
       "library_path": "build/lib/libinference_node.so",
       "auto_start": true,
       "subscribe": [
-        "control/cmd",
         "fusion/localization",
+        "planning/trajectory",
         "perception/obstacles",
-        "planning/trajectory"
+        "control/cmd",
+        "model_ota/active",
+        "road/traffic_lights",
+        "road/geometry"
       ],
       "publish": [
         {
@@ -307,6 +324,12 @@
             "policy": "drop_oldest",
             "reliability": "best_effort"
           }
+        },
+        {
+          "topic": "inference/assist"
+        },
+        {
+          "topic": "inference/raw_cmd"
         }
       ],
       "params": "{\"max_speed\":20.0,\"frequency_hz\":20.0,\"backend\":\"cortex\",\"control_mode\":\"shadow\"}"
@@ -319,7 +342,9 @@
         "fusion/localization",
         "planning/trajectory",
         "perception/obstacles",
-        "control/cmd"
+        "control/cmd",
+        "road/traffic_lights",
+        "road/geometry"
       ],
       "params": "{\"frequency_hz\":20.0,\"output_path\":\"/tmp/flow_train_samples.jsonl\"}"
     },
@@ -392,9 +417,19 @@
         "flowengine/node_info",
         "planning/trajectory",
         "road/geometry",
-        "scene/frame"
+        "scene/frame",
+        "control/cte",
+        "traffic/traffic_lights",
+        "safety/evidence"
       ],
-      "params": "{\"state_file\":\"/tmp/flow_topology.json\",\"export_scene\":true}"
+      "params": "{\"state_file\":\"/tmp/flow_topology.json\",\"export_scene\":true}",
+      "publish": [
+        {
+          "topic": "pem/degrade_event"
+        }
+      ]
     }
-  ]
+  ],
+  "profile": "default",
+  "_governance": "topic-contract: subscribe/publish must match NodePlugin s_inputs/s_outputs (tools/topic_contract_check.py)"
 }

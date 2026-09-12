@@ -67,6 +67,14 @@ LauncherConfig* config_load(const char* config_file) {
         cfg->enable_monitor = cJSON_IsTrue(jenm);
     }
 
+    /* profile: default | experimental | hw (optional; default="default") */
+    strncpy(cfg->profile, "default", sizeof(cfg->profile) - 1);
+    cJSON* jprof = cJSON_GetObjectItemCaseSensitive(root, "profile");
+    if (cJSON_IsString(jprof) && jprof->valuestring && jprof->valuestring[0]) {
+        strncpy(cfg->profile, jprof->valuestring, sizeof(cfg->profile) - 1);
+        cfg->profile[sizeof(cfg->profile) - 1] = '\0';
+    }
+
     /* ── scheduler (global) ───────────────────────────── */
     cJSON* jsch = cJSON_GetObjectItemCaseSensitive(root, "scheduler");
     if (cJSON_IsObject(jsch)) {

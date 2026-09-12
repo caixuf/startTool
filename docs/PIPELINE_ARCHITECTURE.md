@@ -1,5 +1,9 @@
 # KunAutoDrive Pipeline 架构
 
+> **DEPRECATED（2026-09）** — 本文手写拓扑易与代码漂移，不再作为契约真相源。  
+> **请改看：** `CLAUDE.md`（职责铁律）+ `config/pipeline.json`（由 `ci/gates/topic_contract_check.py` 强制对齐 `NodePlugin` 的 `s_inputs`/`s_outputs`）。  
+> 下文仅作历史速览，内容可能过时。
+
 KunAutoDrive 的 ADAS 演示 pipeline 由 15 个节点插件组成，通过 `flow_launcher config/pipeline.json` 配置驱动启动。
 
 ## 数据流

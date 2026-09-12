@@ -95,6 +95,7 @@ typedef struct {
     int log_level;           // 日志级别
     int monitor_interval;    // 监控间隔(秒)
     bool enable_monitor;     // 是否启用监控
+    char profile[32];        // default | experimental | hw
     SchedulerGlobalConfig scheduler; /**< 全局调度器配置 */
     ProcessConfig* processes; // 进程配置数组
     int process_count;       // 进程数量
