@@ -183,9 +183,10 @@ export function createCameraRig(canvas) {
       case 'orbit': {
         if (needsControlSnap) {
           if (ego && Number.isFinite(ego.mapViewHeight)) {
-            // 预览页（mapPreview.js 注入 map_view_* 字段）：定位到地图上方，
-            // 支持自由旋转/缩放/平移查看整张地图。
-            camera.position.set(mapTargetX, mapTargetY + mapHeight, mapTargetZ);
+            // 预览页（mapPreview.js 注入 map_view_* 字段）：定位到地图上方倾角俯视，
+            // 保持水平偏置，避免垂直俯视 (0, -1, 0) 与 up (0, 1, 0) 平行引发 OrbitControls 万向节死锁。
+            const offset = Math.max(30, mapHeight * 0.55);
+            camera.position.set(mapTargetX - offset, mapTargetY + mapHeight, mapTargetZ - offset);
             orbitControls.target.set(mapTargetX, mapTargetY, mapTargetZ);
             camera.lookAt(mapTargetX, mapTargetY, mapTargetZ);
           } else {
@@ -265,8 +266,6 @@ export function createCameraRig(canvas) {
   }
 
   function reset(roadGroup) {
-    orbitControls.target.set(0, 0, 0);
-    orbitControls.update();
     // mapControls 已合并到 orbitControls，无需重复 reset
     needsControlSnap = (mode === 'map' || mode === 'orbit');
     mapAutoFollow = (mode === 'map');
@@ -276,6 +275,8 @@ export function createCameraRig(canvas) {
       // 改为对准原点——车初始位置在原点附近，reset 后能看到车。
       camera.position.set(-10, 10, 0);
       camera.lookAt(0, 0, 0);
+      orbitControls.target.set(0, 0, 0);
+      orbitControls.update();
     }
   }
 

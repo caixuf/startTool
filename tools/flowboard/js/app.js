@@ -48,6 +48,7 @@ const MAP_ROUTE_CACHE = {};
  * 启用：URL ?map=<id>&route=<id>，或 UI 选择地图后点"独立地图"。 */
 const INDEPENDENT_MAP_CACHE = {};   // mapId -> { map, roadNetwork, routeId }
 let _independentMapActive = false;
+let _previewActive = false;
 
 async function loadIndependentMap(mapId, routeId) {
   if (!mapId) return false;
@@ -95,12 +96,21 @@ function applyIndependentRoadNetwork(topo) {
 async function fetchMapRoutes(mapId) {
   if (MAP_ROUTE_CACHE[mapId]) return MAP_ROUTE_CACHE[mapId];
   try {
-    var response = await fetch('/api/map/preview', {
+    var response = await fetch('/api/map/routes', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({map: mapId}),
       cache: 'no-store',
     });
+    if (!response.ok) {
+      // 兼容旧服务：回退至 /api/map/preview
+      response = await fetch('/api/map/preview', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({map: mapId}),
+        cache: 'no-store',
+      });
+    }
     var result = await response.json();
     var apiRoutes = result && result.routes && Array.isArray(result.routes.routes)
       ? result.routes.routes
@@ -198,9 +208,16 @@ async function previewSelectedRoute() {
     var result = await response.json();
     if (!response.ok || !result.ok || !result.map) throw new Error(result && result.error ? result.error : 'map load failed');
     var topoData = toTopo(result.map, result.routes ? result.routes.routes : [], routeId);
+    _previewActive = true;
     update3D(topoData);
     setCameraMode('orbit');
     resetMapView();
+    var banner = document.getElementById('scene3d-preview-banner');
+    var title = document.getElementById('scene3d-preview-title');
+    if (banner) {
+      if (title) title.textContent = '🗺️ 正在预览：' + mapId + ' · ' + (routeId || 'main');
+      banner.style.display = 'flex';
+    }
     toast('已直接在主 3D 视口载入：' + mapId + ' · ' + (routeId || 'main'));
   } catch (err) {
     console.warn('Direct 3D map load failed, fallback to modal:', err);
@@ -216,7 +233,17 @@ async function previewSelectedRoute() {
   }
 }
 
+function exitMapPreview() {
+  _previewActive = false;
+  var banner = document.getElementById('scene3d-preview-banner');
+  if (banner) banner.style.display = 'none';
+  setCameraMode('chase');
+  resetCamera();
+  toast('已退出地图预览，返回实时态势');
+}
+
 function closeMapPreview() {
+  exitMapPreview();
   var modal = document.getElementById('map-preview-modal');
   var frame = document.getElementById('map-preview-frame');
   if (frame) frame.src = 'about:blank';
@@ -1487,7 +1514,7 @@ function updateAll() {
     safeCall('processTopics', updateProcessTopics);
   }
 
-  if (in3D) {
+  if (in3D && !_previewActive) {
     // Feed dead reckoning FIRST so update3D reads fresh _dr.lastX/Z for
     // obstacle / LiDAR world-anchoring without a one-frame lag.
     safeCall('deadreckon', sync2DTarget);
@@ -2771,6 +2798,7 @@ window.flowboard = {
   onRouteChoiceChange: onRouteChoiceChange,
   runSelectedRoute: runSelectedRoute,
   previewSelectedRoute: previewSelectedRoute,
+  exitMapPreview: exitMapPreview,
   closeMapPreview: closeMapPreview,
   doPause: doPause,
   clearFrames: clearFrames,

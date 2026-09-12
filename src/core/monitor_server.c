@@ -836,6 +836,57 @@ static bool dispatch_request(int fd, MonitorServer* ms,
 
     /* POST: /api/training/start|promote → fork+exec modelctl.py */
     if (strcmp(method, "POST") == 0) {
+        /* POST /api/map/routes -> serve only routes metadata (fast, lightweight ~2KB)
+         * Avoids sending the entire 35MB map.json just to populate the route dropdown. */
+        if (strcmp(path, "/api/map/routes") == 0) {
+            char* body = read_post_body(fd, req, req_len, 1024);
+            cJSON* root = body ? cJSON_Parse(body) : NULL;
+            cJSON* map = root ? cJSON_GetObjectItemCaseSensitive(root, "map") : NULL;
+            const char* map_id = cJSON_IsString(map) ? map->valuestring : NULL;
+            bool valid_id = map_id && strlen(map_id) > 0 && strlen(map_id) < 64;
+            if (valid_id) {
+                for (const char* p = map_id; *p; p++) {
+                    char c = *p;
+                    if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+                          (c >= '0' && c <= '9') || c == '_' || c == '-')) {
+                        valid_id = false;
+                        break;
+                    }
+                }
+            }
+            if (!valid_id) {
+                send_response(fd, "400 Bad Request", "application/json",
+                              "{\"ok\":false,\"error\":\"invalid map id\"}");
+            } else {
+                size_t routes_len = 0;
+                char routes_path[PATH_MAX];
+                snprintf(routes_path, sizeof(routes_path), "maps/%s/routes.json", map_id);
+                char* routes_json = read_file(routes_path, &routes_len);
+                if (!routes_json) {
+                    send_response(fd, "404 Not Found", "application/json",
+                                  "{\"ok\":false,\"error\":\"routes not found\"}");
+                } else {
+                    size_t total = routes_len + 32;
+                    char* response = (char*)malloc(total);
+                    if (!response) {
+                        free(routes_json);
+                        send_response(fd, "500 Internal Server Error", "application/json",
+                                      "{\"ok\":false,\"error\":\"out of memory\"}");
+                    } else {
+                        snprintf(response, total, "{\"ok\":true,\"routes\":%s}", routes_json);
+                        send_response_full(fd, "200 OK", "application/json", response,
+                                           false, "no-cache", true, accept_encoding);
+                        free(response);
+                        free(routes_json);
+                    }
+                }
+            }
+            cJSON_Delete(root);
+            free(body);
+            close(fd);
+            return false;
+        }
+
         /* POST /api/map/preview -> serve the authoritative map and routes
          * to the official FlowBoard preview without duplicating geometry.
          * 动态检查 maps/<map_id>/map.json 是否存在，不再硬编码 allowlist。 */
